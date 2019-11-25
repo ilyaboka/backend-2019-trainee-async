@@ -1,6 +1,5 @@
-from collections import Callable
-
 import exceptions
+from typing import Callable
 
 from aiohttp import web
 from aiohttp import web_exceptions

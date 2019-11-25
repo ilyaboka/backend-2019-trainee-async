@@ -1,8 +1,9 @@
-from typing import Callable
-from typing import List
+from typing import Sequence
 
-INTEGRATIONS: List[Callable] = []
+from .google_speech_to_text import GoogleSpeechToText
+from .google_speech_to_text import GoogleSpeechToTextException
 
-__all__ = [
-    'INTEGRATIONS',
+__all__: Sequence[str] = [
+    'GoogleSpeechToText',
+    'GoogleSpeechToTextException',
 ]

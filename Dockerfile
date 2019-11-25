@@ -11,8 +11,12 @@ WORKDIR ${APP_ROOT}
 
 RUN mkdir /config
 
+COPY docker-entrypoint.sh /usr/local/bin
+
 ADD requirements /config/
 RUN pip install --no-cache-dir -U -r /config/internal-requirements.txt && rm /config/internal-requirements.txt
 RUN pip install --no-cache-dir -U -r /config/requirements.txt && rm /config/requirements.txt
 
 ADD src ${APP_ROOT}/src/
+
+ENTRYPOINT ["docker-entrypoint.sh"]
