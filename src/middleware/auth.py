@@ -1,7 +1,8 @@
-import exceptions
 from typing import Optional
 
 from aiohttp import web
+
+import exceptions
 
 
 def check_token(auth_type: str, token: str) -> Optional[dict]:

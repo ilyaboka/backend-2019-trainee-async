@@ -1,9 +1,10 @@
-import exceptions
 from typing import Callable
 
 from aiohttp import web
 from aiohttp import web_exceptions
 from marshmallow import ValidationError as MarshmallowValidationError
+
+import exceptions
 
 
 @web.middleware
