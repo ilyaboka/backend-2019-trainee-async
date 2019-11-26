@@ -52,10 +52,7 @@ class ServerError(BaseAppException):
 
     @classmethod
     def get_schema(cls) -> Schema:
-        """
-        Возвращает схему исключения
-        :return:
-        """
+        """Возвращает схему исключения"""
 
         class ExceptionSchema(Schema):
             code: fields.Constant = fields.Constant(  # type: ignore

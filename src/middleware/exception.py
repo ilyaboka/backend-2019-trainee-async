@@ -25,6 +25,8 @@ async def exception_middleware(
     exc: Optional[exceptions.ServerError] = None
     try:
         response: web.Response = await handler(request)
+    except exceptions.ServerError as ex:
+        exc = ex
     except MarshmallowValidationError as ex:
         exc = exceptions.ValidationError(debug=str(ex), message=exceptions.ValidationError.message)
     except web_exceptions.HTTPBadRequest as ex:
