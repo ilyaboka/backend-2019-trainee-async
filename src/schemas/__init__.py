@@ -1,6 +1,5 @@
 from .message import MessageCreateRequestSchema
 from .message import MessageCreateResponseSchema
-from .recognize import RecognizeRequestSchema
 from .recognize import RecognizeResponseSchema
 
 APISPEC_DEFAULT_PARAMS = [
@@ -9,7 +8,7 @@ APISPEC_DEFAULT_PARAMS = [
 
 __all__ = [
     'APISPEC_DEFAULT_PARAMS',
+    'MessageCreateRequestSchema',
     'MessageCreateResponseSchema',
-    'RecognizeRequestSchema',
     'RecognizeResponseSchema',
 ]
