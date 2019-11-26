@@ -1,40 +1,47 @@
+from http import HTTPStatus
+
 from .base import BaseAppException
 from .base import ServerError
 
 
-class Forbidden(ServerError):
-    status_code = 403
-    message = 'Доступ запрещён'
-
-
-class ValidationError(ServerError):
-    status_code = 500
-    message = 'Ошибка проверки данных'
-
-
-class InputValidationError(ServerError):
-    status_code = 400
-    message = 'Некорректный запрос'
-
-
-class NotFound(ServerError):
-    status_code = 404
-    message = 'Ресурс не найден'
-
-
-class MessageSendingException(ServerError):
-    status_code = 500
-    message = 'Произошла ошибка во время отправки сообщения'
-
-
 class AccessTokenInvalid(ServerError):
-    status_code = 401
+    status_code = HTTPStatus.UNAUTHORIZED.value
     message = 'Неверный токен'
 
 
 class AuthTypeInvalid(ServerError):
-    status_code = 401
+    status_code = HTTPStatus.UNAUTHORIZED.value
     message = 'Неверный тип авторизации'
+
+
+class InputValidationError(ServerError):
+    status_code = HTTPStatus.BAD_REQUEST.value
+    message = 'Некорректный запрос'
+
+
+class Forbidden(ServerError):
+    status_code = HTTPStatus.FORBIDDEN.value
+    message = 'Доступ запрещён'
+
+
+class NotFound(ServerError):
+    status_code = HTTPStatus.NOT_FOUND.value
+    message = 'Ресурс не найден'
+
+
+class MessageSendingException(ServerError):
+    status_code = HTTPStatus.INTERNAL_SERVER_ERROR.value
+    message = 'Произошла ошибка во время отправки сообщения'
+
+
+class UnsupportedMediaType(ServerError):
+    status_code = HTTPStatus.UNSUPPORTED_MEDIA_TYPE.value
+    message = 'Неверный тип медиафайла'
+
+
+class ValidationError(ServerError):
+    status_code = HTTPStatus.INTERNAL_SERVER_ERROR.value
+    message = 'Ошибка проверки данных'
 
 
 __all__ = [
