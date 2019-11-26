@@ -3,7 +3,7 @@ from marshmallow import fields
 
 
 class RecognizeRequestSchema(Schema):
-    speechFile: fields.Raw = fields.Field(
+    speechFile: fields.Raw = fields.Raw(
         description='Аудиофайл, содержащий речь для распознования', location="form", required=True, type='file',
     )
 

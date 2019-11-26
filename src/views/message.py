@@ -1,4 +1,3 @@
-from typing import Any
 from typing import Dict
 from uuid import uuid4
 
@@ -20,13 +19,15 @@ from schemas import MessageCreateResponseSchema
 )
 @request_schema(MessageCreateRequestSchema)
 @response_schema(MessageCreateResponseSchema)
-async def send_message(request):
+async def send_message(request: web.Request) -> web.Response:
     """Отправляет сообщение"""
     message_id: str = str(uuid4())
-    res: Dict[str, Any] = dict(
+    res: Dict[str, str] = dict(
         phoneNumber=request['data']['phoneNumber'], text=request['data']['text'], messageId=message_id,
     )
 
-    validated_games_list = MessageCreateResponseSchema().load(res)
+    validated_games_list: Dict[str, str] = MessageCreateResponseSchema().load(res)
 
-    return web.json_response(validated_games_list)
+    response: web.Response = web.json_response(validated_games_list)
+
+    return response

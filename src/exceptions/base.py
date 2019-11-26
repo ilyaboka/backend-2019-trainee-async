@@ -1,5 +1,6 @@
 import json
 from typing import Any
+from typing import Dict
 from typing import Mapping
 from typing import Optional
 
@@ -39,14 +40,14 @@ class ServerError(BaseAppException):
         self.debug = debug
         super().__init__(body=json.dumps(self.as_dict(), ensure_ascii=False), content_type='application/json')
 
-    def as_dict(self) -> dict:
+    def as_dict(self) -> Dict[str, Any]:
         """
         Преобразует данные класса ошибки в словарь
         :return:
         """
         debug = dict(debug=self.debug) if DEBUG else dict()
         error_body = dict(code=self.code, title=self.title, message=self.message, payload=self.payload, **debug)
-        validated_response_data = self.get_schema().load(error_body)
+        validated_response_data: Dict[str, Any] = self.get_schema().load(error_body)
         return validated_response_data
 
     @classmethod
@@ -57,7 +58,9 @@ class ServerError(BaseAppException):
         """
 
         class ExceptionSchema(Schema):
-            code = fields.Constant(cls.__name__, example=cls.__name__, description='Код ошибки в PascalCase')
+            code: fields.Constant = fields.Constant(  # type: ignore
+                cls.__name__, example=cls.__name__, description='Код ошибки в PascalCase'
+            )
             title = fields.String(
                 required=False,
                 allow_none=True,

@@ -1,3 +1,4 @@
+from typing import Awaitable
 from typing import Callable
 
 from aiohttp import web
@@ -8,20 +9,24 @@ import exceptions
 
 
 @web.middleware
-async def exception_middleware(request: web.Request, handler: Callable) -> web.Response:
+async def exception_middleware(
+    # pylint: disable=bad-continuation
+    request: web.Request,
+    handler: Callable[[web.Request], Awaitable[web.Response]],
+) -> web.Response:
+    # pylint: enable=bad-continuation
     """
     Обрабатывает исключения приложения
-    :param request: объект запроса
-    :param handler: обработчик
-    :return: объект ответа
+    :param request: web.Request объект запроса
+    :param handler: Coroutine[[web.Request], web.Response] обработчик
+    :return: web.Response объект ответа
     """
+    exc: exceptions.ServerError
     try:
         response: web.Response = await handler(request)
         return response
     except MarshmallowValidationError as ex:
         exc = exceptions.ValidationError(debug=str(ex), message=exceptions.ValidationError.message)
-    except exceptions.BaseAppException as ex:
-        exc = ex
     except web_exceptions.HTTPBadRequest as ex:
         exc = exceptions.InputValidationError(debug=ex.text, message=exceptions.InputValidationError.message)
     except web_exceptions.HTTPUnprocessableEntity as ex:
@@ -36,6 +41,6 @@ async def exception_middleware(request: web.Request, handler: Callable) -> web.R
     exc_data = exc.as_dict()
     exc_data['message'] = exc.message
     exc_data.pop('code', None)
-    exc.__init__(**exc_data)
+    type(exc)(**exc_data)
 
     return web.json_response(exc.as_dict(), status=exc.status_code)

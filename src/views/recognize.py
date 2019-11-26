@@ -16,7 +16,7 @@ from schemas import RecognizeResponseSchema
 )
 @form_schema(RecognizeRequestSchema)
 @response_schema(RecognizeResponseSchema)
-async def recognize(request):
+async def recognize(request: web.Request) -> web.Response:
     """Распознать речь"""
     request_data: bytes = request['form']['speechFile'].file.read()
 
@@ -31,4 +31,5 @@ async def recognize(request):
         # pylint: enable=bad-continuation
         raise UnsupportedMediaType('Invalid speech file')
 
-    return web.json_response(dict(recognizedText=await GoogleSpeechToText.recognize(request_data),))
+    response: web.Response = web.json_response(dict(recognizedText=await GoogleSpeechToText.recognize(request_data),))
+    return response
