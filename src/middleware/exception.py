@@ -1,5 +1,6 @@
 from typing import Awaitable
 from typing import Callable
+from typing import Optional
 
 from aiohttp import web
 from aiohttp import web_exceptions
@@ -21,10 +22,9 @@ async def exception_middleware(
     :param handler: Coroutine[[web.Request], web.Response] обработчик
     :return: web.Response объект ответа
     """
-    exc: exceptions.ServerError
+    exc: Optional[exceptions.ServerError] = None
     try:
         response: web.Response = await handler(request)
-        return response
     except MarshmallowValidationError as ex:
         exc = exceptions.ValidationError(debug=str(ex), message=exceptions.ValidationError.message)
     except web_exceptions.HTTPBadRequest as ex:
@@ -37,6 +37,9 @@ async def exception_middleware(
         exc = exceptions.NotFound(debug=ex.text, message=exceptions.NotFound.message)
     except Exception as ex:  # pylint: disable=broad-except
         exc = exceptions.ServerError(debug=str(ex), message=exceptions.ServerError.message)
+
+    if not exc:
+        return response
 
     exc_data = exc.as_dict()
     exc_data['message'] = exc.message
