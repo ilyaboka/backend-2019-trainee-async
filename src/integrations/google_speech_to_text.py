@@ -34,24 +34,26 @@ class GoogleSpeechToText:
     async def get_transcript_from_response(response: ClientResponse) -> str:
         """ Get transcript text from Google REST API Response """
         try:
-            transcript: str = await response.json()['results'][0]['alternatives'][0]['transcript']
+            print(await response.json())
+            transcript: str = (await response.json())['results'][0]['alternatives'][0]['transcript']
             return transcript
         except KeyError as key_error:
-            raise GoogleSpeechToTextException(response.text) from key_error
+            raise GoogleSpeechToTextException("Can't make request to Google Speech-To-Text") from key_error
 
     @classmethod
-    async def recognize(cls, audio_file: bytes, persistent_session: ClientSession) -> str:
+    async def recognize(cls, audio_file: bytes) -> str:
         """ Return transcript for speech in audiofile """
         try:
-            async with persistent_session.post(
-                # pylint: disable=bad-continuation
-                GOOGLE_SPEECH_TO_TEXT_URL,
-                params=dict(key=GOOGLE_API_KEY,),
-                data=dict(
-                    audio=dict(content=b64encode(audio_file).decode('ascii'),), config=dict(languageCode='en-US',),
-                ),
-            ) as response:
-                # pylint: enable=bad-continuation
-                return cls.get_transcript_from_response(response)
+            async with ClientSession() as session:
+                async with session.post(
+                    # pylint: disable=bad-continuation
+                    GOOGLE_SPEECH_TO_TEXT_URL,
+                    params=dict(key=GOOGLE_API_KEY,),
+                    json=dict(
+                        audio=dict(content=b64encode(audio_file).decode('ascii'),), config=dict(languageCode='en-US',),
+                    ),
+                ) as response:
+                    # pylint: enable=bad-continuation
+                    return await cls.get_transcript_from_response(response)
         except (ClientError, UnicodeDecodeError) as exception:
             raise GoogleSpeechToTextException("Can't make request to Google Speech-To-Text") from exception

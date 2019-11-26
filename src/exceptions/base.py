@@ -21,6 +21,7 @@ class ServerError(BaseAppException):
     description: str = ''
 
     def __init__(
+        # pylint: disable=bad-continuation
         self,
         message: Optional[str] = None,
         title: Optional[str] = None,
@@ -29,6 +30,7 @@ class ServerError(BaseAppException):
         exc_code: Optional[str] = None,
         status_code: Optional[int] = None,
     ):
+        # pylint: enable=bad-continuation
         self.title = title or self.title
         self.code = exc_code or self.__class__.__name__
         self.status_code = status_code or self.status_code

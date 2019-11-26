@@ -14,5 +14,4 @@ from schemas import RecognizeResponseSchema
 @response_schema(RecognizeResponseSchema)
 async def recognize(request):
     """Распознать речь"""
-    responce = await GoogleSpeechToText.recognize(await request.read(), request.app['persistent_session'])
-    return web.json_response(dict(recognizedText=responce,))
+    return web.json_response(dict(recognizedText=await GoogleSpeechToText.recognize(await request.read()),))
