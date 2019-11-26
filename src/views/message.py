@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Dict
 from uuid import uuid4
 
@@ -6,16 +7,24 @@ from aiohttp_apispec import docs
 from aiohttp_apispec import request_schema
 from aiohttp_apispec import response_schema
 
-from schemas import APISPEC_DEFAULT_PARAMS
+from exceptions import InputValidationError
+from exceptions import ServerError
 from schemas import MessageCreateRequestSchema
 from schemas import MessageCreateResponseSchema
 
 
 @docs(
-    tags=['SMS'],
-    summary='Запрос отправки сообщения',
     description='Описание запроса',
-    parameters=APISPEC_DEFAULT_PARAMS,
+    responses={
+        HTTPStatus.OK.value: {'schema': MessageCreateResponseSchema, 'description': 'Успешно выполненный запрос',},
+        HTTPStatus.BAD_REQUEST.value: {'schema': InputValidationError.get_schema(), 'description': 'Неверный запрос',},
+        HTTPStatus.INTERNAL_SERVER_ERROR.value: {
+            'schema': ServerError.get_schema(),
+            'description': 'Внутренняя ошибка сервера',
+        },
+    },
+    summary='Запрос отправки сообщения',
+    tags=['SMS'],
 )
 @request_schema(MessageCreateRequestSchema)
 @response_schema(MessageCreateResponseSchema)

@@ -5,7 +5,9 @@ from aiohttp_apispec import docs
 from aiohttp_apispec import form_schema
 from aiohttp_apispec import response_schema
 
+from exceptions import InputValidationError
 from exceptions import ServerError
+from exceptions import UnsupportedMediaType
 from integrations import GoogleSpeechToText
 from schemas import RecognizeRequestSchema
 from schemas import RecognizeResponseSchema
@@ -15,9 +17,9 @@ from schemas import RecognizeResponseSchema
     description='Распознавание речи через Google Speech-To-Text',
     responses={
         HTTPStatus.OK.value: {'schema': RecognizeResponseSchema, 'description': 'Успешно выполненный запрос',},
-        HTTPStatus.BAD_REQUEST.value: {'schema': ServerError.get_schema(), 'description': 'Неверный запрос',},
+        HTTPStatus.BAD_REQUEST.value: {'schema': InputValidationError.get_schema(), 'description': 'Неверный запрос',},
         HTTPStatus.UNSUPPORTED_MEDIA_TYPE.value: {
-            'schema': ServerError.get_schema(),
+            'schema': UnsupportedMediaType.get_schema(),
             'description': 'Неверный тип аудиофайла',
         },
         HTTPStatus.INTERNAL_SERVER_ERROR.value: {
