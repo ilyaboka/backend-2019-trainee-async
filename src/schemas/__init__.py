@@ -1,12 +1,11 @@
 from .message import MessageCreateRequestSchema
 from .message import MessageCreateResponseSchema
-
-APISPEC_DEFAULT_PARAMS = [
-    {'in': 'header', 'name': 'Authorization', 'schema': {'type': 'string'}, 'required': 'true'},
-]
+from .recognize import RecognizeRequestSchema
+from .recognize import RecognizeResponseSchema
 
 __all__ = [
-    'APISPEC_DEFAULT_PARAMS',
     'MessageCreateRequestSchema',
     'MessageCreateResponseSchema',
+    'RecognizeRequestSchema',
+    'RecognizeResponseSchema',
 ]

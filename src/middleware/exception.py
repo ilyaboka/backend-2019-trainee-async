@@ -1,27 +1,34 @@
-from collections import Callable
-
-import exceptions
+from typing import Awaitable
+from typing import Callable
+from typing import Optional
 
 from aiohttp import web
 from aiohttp import web_exceptions
 from marshmallow import ValidationError as MarshmallowValidationError
 
+import exceptions
+
 
 @web.middleware
-async def exception_middleware(request: web.Request, handler: Callable) -> web.Response:
+async def exception_middleware(
+    # pylint: disable=bad-continuation
+    request: web.Request,
+    handler: Callable[[web.Request], Awaitable[web.Response]],
+) -> web.Response:
+    # pylint: enable=bad-continuation
     """
     Обрабатывает исключения приложения
-    :param request: объект запроса
-    :param handler: обработчик
-    :return: объект ответа
+    :param request: web.Request объект запроса
+    :param handler: Coroutine[[web.Request], web.Response] обработчик
+    :return: web.Response объект ответа
     """
+    exc: Optional[exceptions.ServerError] = None
     try:
         response: web.Response = await handler(request)
-        return response
+    except exceptions.ServerError as ex:
+        exc = ex
     except MarshmallowValidationError as ex:
         exc = exceptions.ValidationError(debug=str(ex), message=exceptions.ValidationError.message)
-    except exceptions.BaseAppException as ex:
-        exc = ex
     except web_exceptions.HTTPBadRequest as ex:
         exc = exceptions.InputValidationError(debug=ex.text, message=exceptions.InputValidationError.message)
     except web_exceptions.HTTPUnprocessableEntity as ex:
@@ -33,9 +40,12 @@ async def exception_middleware(request: web.Request, handler: Callable) -> web.R
     except Exception as ex:  # pylint: disable=broad-except
         exc = exceptions.ServerError(debug=str(ex), message=exceptions.ServerError.message)
 
+    if not exc:
+        return response
+
     exc_data = exc.as_dict()
     exc_data['message'] = exc.message
     exc_data.pop('code', None)
-    exc.__init__(**exc_data)
+    type(exc)(**exc_data)
 
     return web.json_response(exc.as_dict(), status=exc.status_code)

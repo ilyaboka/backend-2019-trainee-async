@@ -1,5 +1,6 @@
 import json
 from typing import Any
+from typing import Dict
 from typing import Mapping
 from typing import Optional
 
@@ -20,42 +21,43 @@ class ServerError(BaseAppException):
     title: Optional[str] = None
     description: str = ''
 
-    def __init__(self,
-                 message: Optional[str] = None,
-                 title: Optional[str] = None,
-                 payload: Optional[Mapping[str, Any]] = None,
-                 debug: Optional[str] = None,
-                 exc_code: Optional[str] = None,
-                 status_code: Optional[int] = None,
-                 ):
+    def __init__(
+        # pylint: disable=bad-continuation
+        self,
+        message: Optional[str] = None,
+        title: Optional[str] = None,
+        payload: Optional[Mapping[str, Any]] = None,
+        debug: Optional[str] = None,
+        exc_code: Optional[str] = None,
+        status_code: Optional[int] = None,
+    ):
+        # pylint: enable=bad-continuation
         self.title = title or self.title
         self.code = exc_code or self.__class__.__name__
         self.status_code = status_code or self.status_code
         self.message = message or self.message
         self.payload = payload
         self.debug = debug
-        super().__init__(
-            body=json.dumps(self.as_dict(), ensure_ascii=False), content_type='application/json'
-        )
+        super().__init__(body=json.dumps(self.as_dict(), ensure_ascii=False), content_type='application/json')
 
-    def as_dict(self) -> dict:
+    def as_dict(self) -> Dict[str, Any]:
         """
         Преобразует данные класса ошибки в словарь
         :return:
         """
         debug = dict(debug=self.debug) if DEBUG else dict()
         error_body = dict(code=self.code, title=self.title, message=self.message, payload=self.payload, **debug)
-        validated_response_data = self.get_schema().load(error_body)
+        validated_response_data: Dict[str, Any] = self.get_schema().load(error_body)
         return validated_response_data
 
     @classmethod
     def get_schema(cls) -> Schema:
-        """
-        Возвращает схему исключения
-        :return:
-        """
+        """Возвращает схему исключения"""
+
         class ExceptionSchema(Schema):
-            code = fields.Constant(cls.__name__, example=cls.__name__, description='Код ошибки в PascalCase')
+            code: fields.Constant = fields.Constant(  # type: ignore
+                cls.__name__, example=cls.__name__, description='Код ошибки в PascalCase'
+            )
             title = fields.String(
                 required=False,
                 allow_none=True,
@@ -70,15 +72,15 @@ class ServerError(BaseAppException):
                 required=True,
                 example=None,
                 description='Метаданные ошибки, могут содержать любые данные, '
-                            'необходимые клиенту для корректной обработки ошибки.',
+                'необходимые клиенту для корректной обработки ошибки.',
             )
             debug = fields.String(
                 required=False,
                 allow_none=True,
                 example=None,
                 description='(необязательное поле) Подробная информация об ошибке, '
-                            'случившейся в серверном приложении. Приходит на клиент '
-                            'только в случае, если в серверном приложении включен DEBUG-режим.',
+                'случившейся в серверном приложении. Приходит на клиент '
+                'только в случае, если в серверном приложении включен DEBUG-режим.',
             )
 
         ExceptionSchema.__name__ = cls.__name__
