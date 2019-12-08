@@ -4,6 +4,3 @@ services:
     build: .
     env_file:
       - local.env
-    depends_on:
-      - redis
-      - postgresql
