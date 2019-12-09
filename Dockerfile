@@ -1,10 +1,10 @@
 FROM python:3.8-slim
 
+ENV APP_ROOT /src
+
 RUN apt-get update && apt-get install --assume-yes --no-install-recommends libmagic1
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH /usr/local/lib/python3.8/
-
-ENV APP_ROOT /src
+ENV PYTHONPATH /usr/local/lib/python3.8/:${APP_ROOT}/src
 
 RUN mkdir ${APP_ROOT};
 
